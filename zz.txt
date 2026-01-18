@@ -1,3 +1,6 @@
+The online vsersion run on Render.com account of Agathe ( lundij.dezp@gmail.com )
+Repo hosted in Github dezpray account
+
 
 git add .
 git commit -m "Good step - Completed implementing Shared Preferences"
