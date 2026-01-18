@@ -1,0 +1,18 @@
+
+git add .
+git commit -m "Good step - Completed implementing Shared Preferences"
+git push
+
+
+git add .
+git commit -m "Update"
+git push
+
+==
+
+cd mnt/c/code/github/dezpray/ContainerDezPrayKmpServer
+docker build -t dezpray-server .
+docker run -p 8080:8080 dezpray-server
+
+cd mnt/c/code/github/dezpray/ContainerDezPrayKmpServer
+docker compose up -d --build
