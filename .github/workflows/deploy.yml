@@ -13,7 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to VPS via SSH
+      - name: Test SSH connection
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "SSH connection successful on $(date)"
+
+      - name: Deploy to VPS (zero downtime)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -21,14 +30,25 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
-            cd /opt/dezpray-server
-            git pull
 
-            echo "Building new image..."
+            echo "📦 Moving to project directory..."
+            cd /opt/dezpray-server
+
+            echo "🔄 Fetching latest code..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "🧱 Building new Docker image..."
             docker compose build
 
-            echo "Restarting service with zero-downtime strategy..."
+            echo "🚀 Deploying with zero-downtime restart..."
             docker compose up -d --no-deps --build dezpray-server
 
-            echo "Pruning old images..."
+            echo "🧪 Verifying container is running..."
+            sleep 5
+            docker ps | grep dezpray-server
+
+            echo "🧹 Cleaning unused images..."
             docker image prune -f
+
+            echo "✅ Deployment completed successfully on $(date)"
